@@ -12,6 +12,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var buttons: Array<Button>
     var isPlayerXTurn : Boolean = true
+    var gameOver : Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,17 +44,24 @@ class MainActivity : AppCompatActivity() {
         for (button in buttons) {
             // activates when user clicks button
             button.setOnClickListener {
-                // if the button has no text
-                if (button.text.isEmpty()) {
-                    button.text = if (isPlayerXTurn) "X" else "O"
+                if (!gameOver) {
+                    // if the button has no text
+                    if (button.text.isEmpty()) {
+                        button.text = if (isPlayerXTurn) "X" else "O"
+                    }
+                    if (checkWin()) {
+                        textView.text = if (isPlayerXTurn) "Player X Wins!" else "Player O Wins!"
+                        gameOver = true
+                    }
+                    else if (checkTie()) {
+                        textView.text = "It's a Tie!"
+                        gameOver = true
+                    }
+                    else {
+                        isPlayerXTurn = !isPlayerXTurn
+                        textView.text = "Player ${if (isPlayerXTurn) 'X' else 'O'}'s turn"
+                    }
                 }
-                if (checkWin()) {
-                    textView.text = if (isPlayerXTurn) "Player X Wins!" else "Player O Wins!"
-                } else {
-                    isPlayerXTurn = !isPlayerXTurn
-                    textView.text = "Player ${if (isPlayerXTurn) 'X' else 'O'}'s turn"
-                }
-
             }
         }
 
@@ -67,6 +75,7 @@ class MainActivity : AppCompatActivity() {
             }
             textView.text = "Player X's turn"
             isPlayerXTurn = true
+            gameOver = false
         }
     }
 
@@ -93,5 +102,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return false
+    }
+
+    private fun checkTie() : Boolean {
+        for (button in buttons) {
+            if (button.text.isEmpty()) {
+                return false
+            }
+        }
+        return true
     }
 }
