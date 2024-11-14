@@ -9,6 +9,10 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var buttons: Array<Button>
+    var isPlayerXTurn : Boolean = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -19,53 +23,75 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        var isPlayerXTurn : Boolean = true
-
-        val buttons = arrayOf(
-            R.id.button, R.id.button2, R.id.button3,
-            R.id.button4, R.id.button5, R.id.button6,
-            R.id.button7, R.id.button8, R.id.button9
+        // Initialize buttons array
+        buttons = arrayOf(
+            findViewById(R.id.button),
+            findViewById(R.id.button2),
+            findViewById(R.id.button3),
+            findViewById(R.id.button4),
+            findViewById(R.id.button5),
+            findViewById(R.id.button6),
+            findViewById(R.id.button7),
+            findViewById(R.id.button8),
+            findViewById(R.id.button9)
         )
 
         // gets textView by id
-        val textView : TextView = findViewById(R.id.textView)
+        val textView: TextView = findViewById(R.id.textView)
 
         // iterates through array of buttons
-        for (id in buttons) {
-            val button : Button = findViewById(id)
+        for (button in buttons) {
             // activates when user clicks button
             button.setOnClickListener {
                 // if the button has no text
                 if (button.text.isEmpty()) {
-                    if (isPlayerXTurn) {
-                        button.text = "X"
-                        textView.text = "Player O's turn"
-                    }
-                    else {
-                        button.text = "0"
-                        textView.text = "Player X's turn"
-                    }
-                    // after every button click, this line switches the turn to the other player
-                    // goes back and forth
+                    button.text = if (isPlayerXTurn) "X" else "O"
+                }
+                if (checkWin()) {
+                    textView.text = if (isPlayerXTurn) "Player X Wins!" else "Player O Wins!"
+                } else {
                     isPlayerXTurn = !isPlayerXTurn
+                    textView.text = "Player ${if (isPlayerXTurn) 'X' else 'O'}'s turn"
                 }
 
             }
         }
 
         // gets newGame by id
-        val newGame : Button = findViewById(R.id.newGameButton)
+        val newGame: Button = findViewById(R.id.newGameButton)
 
         // clears text from all buttons if newGame is clicked
         newGame.setOnClickListener {
-            for (id in buttons) {
-                val button: Button = findViewById(id)
+            for (button in buttons) {
                 button.text = ""
             }
-            // change text back to Player X
             textView.text = "Player X's turn"
-            // set to true
             isPlayerXTurn = true
         }
+    }
+
+    private fun checkWin(): Boolean
+    {
+        val winningCombinations = arrayOf(
+            arrayOf(0, 1, 2),
+            arrayOf(3, 4, 5),
+            arrayOf(6, 7, 8),
+            arrayOf(0, 3, 6),
+            arrayOf(1, 4, 7),
+            arrayOf(2, 5, 8),
+            arrayOf(0, 4, 8),
+            arrayOf(2, 4, 6)
+        )
+        for (combination in winningCombinations) {
+            val a = combination[0]
+            val b = combination[1]
+            val c = combination[2]
+            if (buttons[a].text.toString().isNotEmpty()
+                    && buttons[a].text.toString() == buttons[b].text.toString()
+                    && buttons[a].text.toString() == buttons[c].text.toString()) {
+                return true
+            }
+        }
+        return false
     }
 }
